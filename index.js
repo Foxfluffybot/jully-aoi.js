@@ -1,96 +1,18 @@
-//|------------|
-const express = require('express');
-const app = express();
-const { Util } = require("aoi.js");
-const { setup } = require("@akarui/aoi.parser");
-setup(Util);
+const { AoiClient } = require("aoi.js");
+const config = require("./config.js")
+const fs = require('fs');
 
-app.get('/', (req, res) => {
-    res.send('To online!!');
-});
+const client = new AoiClient(config.Bot);
 
-app.listen(3000, () => {
-    console.log('To online!!');
-});  
-
-const aoijs = require("aoi.js");
+require("./src/types/events/variavel.js")(client);
+require("./src/types/events/status.js")(client);
+require("./src/types/functions/antiCrash.js")(client);
 
 
-const bot = new aoijs.AoiClient({
-token: "seu token aqui",
-prefix: "$getGuildVar[prefix;$guildID]",
-intents: ["MessageContent", "GuildMessages", "Guilds"],
-events: ["onMessage", "onInteractionCreate"],
-database: {
-    type: "aoi.db",
-    db: require("@akarui/aoi.db"),
-    dbType: "KeyValue",
-    tables: ["main"],
-    securityKey: "a-32-characters-long-string-here",
-  }
+// Handler
+client.loadCommands("./src/comandos/", true);
+for (const file of fs.readdirSync('./src/types/functions').filter(file => file.endsWith('.js'))) {
+	require(`./src/types/functions/${file}`)(client);
+}
 
-})
-
-bot.status({
- text: "em $guildCount servidores!",
- type: "PLAYING",
-//PLAYING
-//WATHING
-//LISTENING
-//STREAMING
-//COMPETING
- status: "Idle",
- time: 12
-})
-
-bot.variables({
-  cor: "#303136",
-  prefix: "j.",
-})
-
-bot.variables({
-  cupcakes: "0",
-  sobremim: "A Jully é a melhor!",
-  boost: "",
-  dev: "",
-  prem: "",
-  poro: "",
-  pprata: "",
-  pbronze: "",
-  dias: "",
-  sap: "",
-  tarta: "",
-  queijo: "",
-  cbugs: "",
-  premium: "false",
-  pizza: "",
-  prim: "",
-  secon: "",
-  terc: "",
-  cat: "",
-  espada: "",
-  estrela: "",
-  emoji: "",
-  banner: "https://cdn.discordapp.com/attachments/1139345429180453034/1147140890591240242/37c68ff0d0b664704990c337f9cddf4b.jpg",
-  vara: "100",
-  peixe: "0",
-  blacklist: "falso",
-  motivo: "Não especificado",
-  dog: "",
-  gato: "",
-  raposa: "",
-  papagaio: "",
-  vaca: "",
-  porco: "",
-  galinha: "",
-  camelo: "",
-  cobre: "0",
-  ferro: "0",
-  ouro: "0",
-  dima: "0",
-  netherite: "0",
-  pets: "Nenhum"
-
-})
-  const loader = new aoijs.LoadCommands(bot)
-  loader.load(bot.cmd,"./commands/")
+// Créditos: eufirst (780140248125407272)
